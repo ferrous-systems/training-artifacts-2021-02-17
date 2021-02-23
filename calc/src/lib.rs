@@ -28,14 +28,16 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
                 };
 
                 let expr = match word {
+
                     "+" => Expr::Plus(Box::new(a), Box::new(b)),
                     "-" => Expr::Minus(Box::new(a), Box::new(b)),
                     "*" => Expr::Multiply(Box::new(a), Box::new(b)),
                     "/" => Expr::Divide(Box::new(a), Box::new(b)),
-                    other => {
+                    whatever => {
                         // Shouldn't be possible, checked
-                        return Err(ParseError::UnexpectedInput(word.to_string()));
+                        return Err(ParseError::UnexpectedInput(whatever.to_string()));
                     }
+
                 };
 
                 stack.push(expr);
@@ -87,6 +89,7 @@ pub enum ParseError {
 
 pub fn eval(expr: &Expr) -> Result<i64, EvalError> {
     match expr {
+
         Expr::Number(num) => Ok(*num),
         Expr::Sqr(inner_expr) => {
             let number: i64 = eval(inner_expr)?;
@@ -207,6 +210,10 @@ mod tests {
         ];
 
         assert_eq!(expressions.len(), expectations.len());
+
+        // iter_a
+        // iter_b
+        // iter -> (a, b)
 
         for (expr, expected) in expressions.iter().zip(expectations) {
             let parsed = parse(expr).unwrap();
