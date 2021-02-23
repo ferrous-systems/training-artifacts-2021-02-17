@@ -1,4 +1,7 @@
-use calc::*;
+use calc::{
+    parse::parse,
+    eval::eval,
+};
 
 #[test]
 fn round_trip_sqr() {
