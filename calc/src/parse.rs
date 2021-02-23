@@ -1,6 +1,6 @@
 use crate::Expr;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParseError {
     UnexpectedInput(String),
     InsufficientNumbers,

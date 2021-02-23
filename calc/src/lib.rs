@@ -1,5 +1,6 @@
 pub mod eval;
 pub mod parse;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub enum Expr {
@@ -11,12 +12,46 @@ pub enum Expr {
     Divide(Box<Expr>, Box<Expr>),
 }
 
+impl FromStr for Expr {
+    type Err = parse::ParseError;
+
+    fn from_str(the_str: &str) -> Result<Self, Self::Err> {
+        parse::parse(the_str)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
-        parse::parse,
+        parse::{parse, ParseError},
         eval::eval,
+        Expr
     };
+    use std::str::FromStr;
+
+    #[test]
+    fn test_from_str() {
+        let text = "3 sqr";
+        let _parsed = Expr::from_str(text).unwrap();
+        let _parsed2 = text.parse::<Expr>().unwrap();
+        let _parsed3: Expr = text.parse().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = r#"called `Result::unwrap()` on an `Err` value: UnexpectedInput("bad")"#)]
+    fn test_from_str_bad() {
+        let text = "bad";
+        let _parsed = Expr::from_str(text).unwrap();
+        let _parsed2 = text.parse::<Expr>().unwrap();
+        let _parsed3: Expr = text.parse().unwrap();
+    }
+
+    #[test]
+    fn test_from_str_bad_no_panic() {
+        let text = "bad";
+        let parsed = Expr::from_str(text);
+        assert_eq!(parsed, Err(ParseError::UnexpectedInput("bad".to_string())))
+    }
 
     #[test]
     fn round_trip_sqr() {
