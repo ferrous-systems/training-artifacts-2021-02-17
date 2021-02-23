@@ -1,14 +1,48 @@
+//! The Ferrous Calculator Library
+//!
+//! This is a great calculator for rust. You should use it
+//!
+//! ## Who should use this?
+//!
+//! * You!
+//! * Everyone!
+//!
+//! ## Questions?
+//!
+//! Nope!
+
 pub mod eval;
 pub mod parse;
 use std::str::FromStr;
 
+pub mod prelude {
+    pub use crate::eval::{eval, EvalError};
+    pub use crate::parse::{parse, ParseError};
+    pub use crate::Expr;
+}
+
+/// A single AST expression tree
+///
+/// This is parsed from text by [`parse()`](crate::parse::parse()), and evaluated
+/// into an `i64` by `eval()`.
 #[derive(Debug, PartialEq)]
 pub enum Expr {
+    /// Just a number
     Number(i64),
+
+    /// Expression Squared
     Sqr(Box<Expr>),
+
+    /// A + B
     Plus(Box<Expr>, Box<Expr>),
+
+    /// A - B
     Minus(Box<Expr>, Box<Expr>),
+
+    /// A * B
     Multiply(Box<Expr>, Box<Expr>),
+
+    /// A / B
     Divide(Box<Expr>, Box<Expr>),
 }
 
@@ -33,6 +67,7 @@ mod tests {
     fn test_from_str() {
         let text = "3 sqr";
         let _parsed = Expr::from_str(text).unwrap();
+
         let _parsed2 = text.parse::<Expr>().unwrap();
         let _parsed3: Expr = text.parse().unwrap();
     }

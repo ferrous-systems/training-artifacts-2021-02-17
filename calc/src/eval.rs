@@ -1,3 +1,6 @@
+//! Contains parts for evaulating text into the AST
+
+
 use std::fmt::{
     Formatter,
     Error as FmtError,
@@ -6,8 +9,11 @@ use std::fmt::{
 
 use crate::Expr;
 
+/// The type returned by the `eval()` function
 #[derive(Debug)]
 pub enum EvalError {
+    /// This error represents the attempt to divide
+    /// by zero during an evaluation step
     DivideByZero,
 }
 
@@ -21,7 +27,19 @@ impl Display for EvalError {
 // "Marker Trait"
 impl std::error::Error for EvalError { }
 
-
+/// This is an eval funct
+///
+/// ## Examples
+///
+/// ```rust
+/// # use calc::parse::parse;
+/// # use calc::eval::eval;
+/// #
+/// let text = "3 sqr";
+/// let ast_expr = parse(text).unwrap();
+/// let evaled = eval(&ast_expr).unwrap();
+/// # assert_eq!(evaled, 9);
+/// ```
 pub fn eval(expr: &Expr) -> Result<i64, EvalError> {
     match expr {
 

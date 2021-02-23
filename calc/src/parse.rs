@@ -7,6 +7,26 @@ pub enum ParseError {
 }
 
 
+/// Parse a postfix notation string expression to a rendered AST
+///
+/// This function takes input in the form "4 3 +", and will produce
+/// an `Expr` item.
+///
+/// ## Examples
+///
+/// ```rust
+/// # use calc::parse::parse;
+/// #
+/// let text = "4 3 +";
+/// let ast_expr = parse(text).unwrap();
+/// ```
+///
+/// ```rust
+/// # use calc::parse::parse;
+/// #
+/// let text = "3 sqr";
+/// let ast_expr = parse(text).unwrap();
+/// ```
 pub fn parse(input: &str) -> Result<Expr, ParseError> {
     let mut stack: Vec<Expr> = Vec::new();
 
