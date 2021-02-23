@@ -11,8 +11,6 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
     for word in input.split_ascii_whitespace() {
         match word {
             "sqr" => {
-                println!("SQR");
-
                 let item = match stack.pop() {
                     Some(i) => i,
                     None => return Err(ParseError::InsufficientNumbers),
@@ -21,9 +19,7 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
                 let exp_sqr = Expr::Sqr(Box::new(item));
                 stack.push(exp_sqr);
             }
-            "+" | "-" => {
-                println!("ADD OR MINUS");
-
+            "+" | "-" | "*" | "/" => {
                 let (a, b) = match(stack.pop(), stack.pop()) {
                     (Some(b), Some(a)) => {
                         (a, b)
@@ -31,16 +27,21 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
                     _ => return Err(ParseError::InsufficientNumbers),
                 };
 
-                let expr = if word == "+" {
-                    Expr::Plus(Box::new(a), Box::new(b))
-                } else {
-                    Expr::Minus(Box::new(a), Box::new(b))
+                let expr = match word {
+                    "+" => Expr::Plus(Box::new(a), Box::new(b)),
+                    "-" => Expr::Minus(Box::new(a), Box::new(b)),
+                    "*" => Expr::Multiply(Box::new(a), Box::new(b)),
+                    "/" => Expr::Divide(Box::new(a), Box::new(b)),
+                    other => {
+                        // Shouldn't be possible, checked
+                        return Err(ParseError::UnexpectedInput(word.to_string()));
+                    }
                 };
+
                 stack.push(expr);
             }
             x => {
                 if let Ok(num) = x.parse::<i64>() {
-                    println!("Got num: {}", num);
                     let exp_num = Expr::Number(num);
                     stack.push(exp_num);
                 } else {
@@ -61,7 +62,7 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
 
 #[derive(Debug)]
 pub enum EvalError {
-    Todo,
+    DivideByZero,
 }
 
 impl Display for EvalError {
@@ -99,7 +100,31 @@ pub fn eval(expr: &Expr) -> Result<i64, EvalError> {
             let evald = a + b;
             Ok(evald)
         }
-        _ => todo!(),
+        Expr::Minus(a_expr, b_expr) => {
+            let a: i64 = eval(a_expr)?;
+            let b: i64 = eval(b_expr)?;
+
+            let evald = a - b;
+            Ok(evald)
+        }
+        Expr::Multiply(a_expr, b_expr) => {
+            let a: i64 = eval(a_expr)?;
+            let b: i64 = eval(b_expr)?;
+
+            let evald = a * b;
+            Ok(evald)
+        }
+        Expr::Divide(a_expr, b_expr) => {
+            let a: i64 = eval(a_expr)?;
+            let b: i64 = eval(b_expr)?;
+
+            if b == 0 {
+                return Err(EvalError::DivideByZero);
+            }
+
+            let evald = a / b;
+            Ok(evald)
+        }
     }
 }
 
@@ -163,6 +188,32 @@ mod tests {
         let parsed = parse(text).unwrap();
         let evald = eval(&parsed).unwrap();
         assert_eq!(expected, evald);
+    }
+
+    #[test]
+    fn round_trip_examples() {
+        let expressions = &[
+            "92",
+            "40 2 +",
+            "1 3 + 2 /",
+            "3 sqr 4 sqr + 5 sqr -",
+        ];
+
+        let expectations = &[
+            92i64,
+            42,
+            2,
+            0
+        ];
+
+        assert_eq!(expressions.len(), expectations.len());
+
+        for (expr, expected) in expressions.iter().zip(expectations) {
+            let parsed = parse(expr).unwrap();
+            let evald = eval(&parsed).unwrap();
+            println!("'{}' => {}", expr, expected);
+            assert_eq!(*expected, evald);
+        }
     }
 
 }
