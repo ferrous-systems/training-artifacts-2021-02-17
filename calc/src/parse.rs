@@ -5,6 +5,7 @@ pub enum ParseError {
     UnexpectedInput(String),
     InsufficientNumbers,
     EmptyStack,
+    ExcessStack,
 }
 
 
@@ -81,9 +82,11 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
     // We hit this case if the input is empty!
     if stack.is_empty() {
         return Err(ParseError::EmptyStack);
+    } else if stack.len() > 1 {
+        return Err(ParseError::ExcessStack);
     }
 
-    assert_eq!(stack.len(), 1);
+    // We know stack.len() == 1, unwrap okay!
     let res = stack.pop().unwrap();
     Ok(res)
 }
