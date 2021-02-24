@@ -4,6 +4,7 @@ use crate::Expr;
 pub enum ParseError {
     UnexpectedInput(String),
     InsufficientNumbers,
+    EmptyStack,
 }
 
 
@@ -76,6 +77,11 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
             }
         }
     };
+
+    // We hit this case if the input is empty!
+    if stack.is_empty() {
+        return Err(ParseError::EmptyStack);
+    }
 
     assert_eq!(stack.len(), 1);
     let res = stack.pop().unwrap();
