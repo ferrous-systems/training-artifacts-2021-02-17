@@ -47,14 +47,14 @@ fn main() -> Result<(), CliError> {
     }
 
     // Basically how a "for" loop works in Rust.
-    loop {
-        match iter.next() {
-            Some(data) => {
-                // THIS IS THE BODY OF THE FOR LOOP
-            }
-            None => break,
-        }
-    }
+    // loop {
+    //     match iter.next() {
+    //         Some(data) => {
+    //             // THIS IS THE BODY OF THE FOR LOOP
+    //         }
+    //         None => break,
+    //     }
+    // }
 
     Ok(())
 }
