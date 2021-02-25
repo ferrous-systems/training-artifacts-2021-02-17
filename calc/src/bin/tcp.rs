@@ -4,6 +4,7 @@ use std::net::{TcpListener, TcpStream};
 use std::io;
 use std::io::prelude::*;
 use std::thread::spawn;
+use calc::prelude::*;
 
 // to connect:
 //
@@ -22,8 +23,26 @@ fn handle_client(mut stream: TcpStream) -> Result<(), io::Error> {
             }
             Ok(bytes) => {
                 let string_data = String::from_utf8_lossy(&buf[..bytes]);
-                println!("{}", string_data);
-                stream.write_all(&buf[..bytes])?;
+                let parsed = match parse(&string_data) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        let formatted = format!("ERROR: {:?}\n", e);
+                        stream.write_all(formatted.as_bytes())?;
+                        return Ok(());
+                    }
+                };
+
+                let evaled: i64 = match eval(&parsed) {
+                    Ok(ev) => ev,
+                    Err(e) => {
+                        let formatted = format!("ERROR: {:?}\n", e);
+                        stream.write_all(formatted.as_bytes())?;
+                        return Ok(());
+                    }
+                };
+
+                let formatted = format!("= {}\n", evaled);
+                stream.write_all(formatted.as_bytes())?;
                 return Ok(());
             }
             Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
