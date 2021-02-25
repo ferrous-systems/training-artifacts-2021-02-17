@@ -21,39 +21,32 @@ use std::ffi::CStr;
 
 pub use calc::Expr;
 
+/// This will return null if unsuccessful
 #[no_mangle]
 pub extern "C" fn c_parse(
     maybe_cstr: *const c_char,
-    output: *mut Expr,
-) -> isize {
+) -> *mut Expr {
     // Check if cstr is valid
     if maybe_cstr.is_null() {
-        return -1;
+        return std::ptr::null_mut();
     }
     let cstr = unsafe {
         CStr::from_ptr(maybe_cstr)
     };
     let string_data = match cstr.to_str() {
         Ok(s) => s,
-        Err(_e) => return -2,
+        Err(_e) => return std::ptr::null_mut(),
     };
-
-    // check if output is non-null
-    if output.is_null() {
-        return -1;
-    }
 
     // Do parse, do eval
-    let parsed = match parse(string_data) {
-        Ok(p) => p,
-        Err(_e) => return -3,
-    };
-
-    unsafe {
-        *output = parsed;
+    match parse(string_data) {
+        Ok(p) => {
+            let ret_val: &'static mut Expr = Box::leak(Box::new(p));
+            let ret_val_ptr = ret_val as *mut Expr;
+            ret_val_ptr
+        },
+        Err(_e) => std::ptr::null_mut(),
     }
-
-    0
 }
 
 #[no_mangle]
@@ -123,6 +116,15 @@ pub extern "C" fn parse_and_eval(
     }
 
     0
+}
+
+#[no_mangle]
+pub extern "C" fn release_expr(box_expr: *mut Expr) {
+    if !box_expr.is_null() {
+        unsafe {
+            let _box = Box::from_raw(box_expr);
+        }
+    }
 }
 
 //

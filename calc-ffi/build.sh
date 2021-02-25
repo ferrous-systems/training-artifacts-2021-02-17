@@ -3,6 +3,7 @@
 set -euxo pipefail
 
 cargo build
+cbindgen -d -l c > ./calc_ffi.h
 
 gcc \
     -I. \
