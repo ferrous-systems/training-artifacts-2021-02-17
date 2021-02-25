@@ -5,6 +5,7 @@ use std::io;
 use std::io::prelude::*;
 use std::thread::spawn;
 use calc::prelude::*;
+use std::sync::{Arc, Mutex};
 
 // to connect:
 //
@@ -12,7 +13,7 @@ use calc::prelude::*;
 // telnet 127.0.0.1 8080
 // ```
 
-fn handle_client(mut stream: TcpStream) -> Result<(), io::Error> {
+fn handle_client(mut stream: TcpStream, sum_hdl: Arc<Mutex<i64>>) -> Result<(), io::Error> {
     let mut buf = [0u8; 128];
     println!("Handling client...");
 
@@ -41,6 +42,13 @@ fn handle_client(mut stream: TcpStream) -> Result<(), io::Error> {
                     }
                 };
 
+                let current_sum: i64 = sum_hdl.lock().map(|mut g| {
+                    *g += evaled;
+                    *g
+                }).unwrap();
+
+                println!("Sum: {}", current_sum);
+
                 let formatted = format!("= {}\n", evaled);
                 stream.write_all(formatted.as_bytes())?;
                 return Ok(());
@@ -57,12 +65,17 @@ fn handle_client(mut stream: TcpStream) -> Result<(), io::Error> {
 
 fn main() -> io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:8080")?;
+    let total_sum = Arc::new(Mutex::new(0i64));
 
     // accept connections and process them serially
     for stream in listener.incoming() {
+        // When you clone an Arc, or Atomic Reference Counted wrapper,
+        // ONLY a new handle is cloned. We create a NEW HANDLE to the
+        // SAME DATA
+        let new_sum_handle = total_sum.clone();
         // Spawn a thread
         let _ = spawn(move || {
-            handle_client(stream?)
+            handle_client(stream?, new_sum_handle)
         });
     }
 
