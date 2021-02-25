@@ -3,6 +3,7 @@
 use std::net::{TcpListener, TcpStream};
 use std::io;
 use std::io::prelude::*;
+use std::thread::spawn;
 
 // to connect:
 //
@@ -11,7 +12,6 @@ use std::io::prelude::*;
 // ```
 
 fn handle_client(mut stream: TcpStream) -> Result<(), io::Error> {
-    // let mut buf = String::new();
     let mut buf = [0u8; 128];
     println!("Handling client...");
 
@@ -34,11 +34,6 @@ fn handle_client(mut stream: TcpStream) -> Result<(), io::Error> {
             }
         };
     }
-
-
-    println!("Done handling!");
-
-    Ok(())
 }
 
 fn main() -> io::Result<()> {
@@ -46,8 +41,12 @@ fn main() -> io::Result<()> {
 
     // accept connections and process them serially
     for stream in listener.incoming() {
-        handle_client(stream?);
+        // Spawn a thread
+        let _ = spawn(move || {
+            handle_client(stream?)
+        });
     }
+
     Ok(())
 }
 
