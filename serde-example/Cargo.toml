@@ -1,0 +1,20 @@
+[package]
+name = "serde-example"
+version = "0.1.0"
+authors = ["James Munns <james.munns@ferrous-systems.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# This are "data format"s
+serde_json = "1.0.63"
+
+[dependencies.postcard]
+version = "0.5.2"
+features = ["use-std"]
+
+[dependencies.serde]
+# These are used to describe the "data model"
+version = "1.0.123"
+features = ["derive"]

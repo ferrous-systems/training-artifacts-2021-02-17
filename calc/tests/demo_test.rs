@@ -1,7 +1,4 @@
-use calc::{
-    parse::parse,
-    eval::eval,
-};
+use calc::{eval::eval, parse::parse};
 
 #[test]
 fn round_trip_add() {

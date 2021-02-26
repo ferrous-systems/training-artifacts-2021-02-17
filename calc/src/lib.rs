@@ -57,9 +57,9 @@ impl FromStr for Expr {
 #[cfg(test)]
 mod tests {
     use crate::{
-        parse::{parse, ParseError},
         eval::eval,
-        Expr
+        parse::{parse, ParseError},
+        Expr,
     };
     use std::str::FromStr;
 
@@ -73,7 +73,9 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = r#"called `Result::unwrap()` on an `Err` value: UnexpectedInput("bad")"#)]
+    #[should_panic(
+        expected = r#"called `Result::unwrap()` on an `Err` value: UnexpectedInput("bad")"#
+    )]
     fn test_from_str_bad() {
         let text = "bad";
         let _parsed = Expr::from_str(text).unwrap();
@@ -108,19 +110,9 @@ mod tests {
 
     #[test]
     fn round_trip_examples() {
-        let expressions = &[
-            "92",
-            "40 2 +",
-            "1 3 + 2 /",
-            "3 sqr 4 sqr + 5 sqr -",
-        ];
+        let expressions = &["92", "40 2 +", "1 3 + 2 /", "3 sqr 4 sqr + 5 sqr -"];
 
-        let expectations = &[
-            92i64,
-            42,
-            2,
-            0
-        ];
+        let expectations = &[92i64, 42, 2, 0];
 
         assert_eq!(expressions.len(), expectations.len());
 
@@ -135,5 +127,4 @@ mod tests {
             assert_eq!(*expected, evald);
         }
     }
-
 }

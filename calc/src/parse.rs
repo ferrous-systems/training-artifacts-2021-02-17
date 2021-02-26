@@ -8,7 +8,6 @@ pub enum ParseError {
     ExcessStack,
 }
 
-
 /// Parse a postfix notation string expression to a rendered AST
 ///
 /// This function takes input in the form "4 3 +", and will produce
@@ -44,15 +43,12 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
                 stack.push(exp_sqr);
             }
             "+" | "-" | "*" | "/" => {
-                let (a, b) = match(stack.pop(), stack.pop()) {
-                    (Some(b), Some(a)) => {
-                        (a, b)
-                    }
+                let (a, b) = match (stack.pop(), stack.pop()) {
+                    (Some(b), Some(a)) => (a, b),
                     _ => return Err(ParseError::InsufficientNumbers),
                 };
 
                 let expr = match word {
-
                     "+" => Expr::Plus(Box::new(a), Box::new(b)),
                     "-" => Expr::Minus(Box::new(a), Box::new(b)),
                     "*" => Expr::Multiply(Box::new(a), Box::new(b)),
@@ -61,7 +57,6 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
                         // Shouldn't be possible, checked
                         return Err(ParseError::UnexpectedInput(whatever.to_string()));
                     }
-
                 };
 
                 stack.push(expr);
@@ -77,7 +72,7 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
                 }
             }
         }
-    };
+    }
 
     // We hit this case if the input is empty!
     if stack.is_empty() {
@@ -90,4 +85,3 @@ pub fn parse(input: &str) -> Result<Expr, ParseError> {
     let res = stack.pop().unwrap();
     Ok(res)
 }
-

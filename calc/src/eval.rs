@@ -1,11 +1,6 @@
 //! Contains parts for evaulating text into the AST
 
-
-use std::fmt::{
-    Formatter,
-    Error as FmtError,
-    Display
-};
+use std::fmt::{Display, Error as FmtError, Formatter};
 
 use crate::Expr;
 
@@ -17,7 +12,6 @@ pub enum EvalError {
     DivideByZero,
 }
 
-
 impl Display for EvalError {
     fn fmt(&self, _: &mut Formatter<'_>) -> Result<(), FmtError> {
         todo!()
@@ -25,7 +19,7 @@ impl Display for EvalError {
 }
 
 // "Marker Trait"
-impl std::error::Error for EvalError { }
+impl std::error::Error for EvalError {}
 
 /// This is an eval funct
 ///
@@ -42,7 +36,6 @@ impl std::error::Error for EvalError { }
 /// ```
 pub fn eval(expr: &Expr) -> Result<i64, EvalError> {
     match expr {
-
         Expr::Number(num) => Ok(*num),
         Expr::Sqr(inner_expr) => {
             let number: i64 = eval(inner_expr)?;
@@ -84,12 +77,11 @@ pub fn eval(expr: &Expr) -> Result<i64, EvalError> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     // use crate::parse; // choice 1
     // use super::parse; // choice 2
-    use super::*;     // choice 3
+    use super::*; // choice 3
     use crate::parse::parse;
 
     #[test]
@@ -112,10 +104,7 @@ mod tests {
     fn eval_add() {
         // "3 + 2"
         let text = "3 2 +";
-        let expected = Expr::Plus(
-            Box::new(Expr::Number(3)),
-            Box::new(Expr::Number(2)),
-        );
+        let expected = Expr::Plus(Box::new(Expr::Number(3)), Box::new(Expr::Number(2)));
         let parsed = parse(text).unwrap();
         assert_eq!(parsed, expected);
     }

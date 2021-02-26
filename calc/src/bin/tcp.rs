@@ -1,11 +1,9 @@
-
-
-use std::net::{TcpListener, TcpStream};
+use calc::prelude::*;
 use std::io;
 use std::io::prelude::*;
-use std::thread::spawn;
-use calc::prelude::*;
+use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
+use std::thread::spawn;
 
 // to connect:
 //
@@ -42,10 +40,13 @@ fn handle_client(mut stream: TcpStream, sum_hdl: Arc<Mutex<i64>>) -> Result<(), 
                     }
                 };
 
-                let current_sum: i64 = sum_hdl.lock().map(|mut g| {
-                    *g += evaled;
-                    *g
-                }).unwrap();
+                let current_sum: i64 = sum_hdl
+                    .lock()
+                    .map(|mut g| {
+                        *g += evaled;
+                        *g
+                    })
+                    .unwrap();
 
                 println!("Sum: {}", current_sum);
 
@@ -74,11 +75,8 @@ fn main() -> io::Result<()> {
         // SAME DATA
         let new_sum_handle = total_sum.clone();
         // Spawn a thread
-        let _ = spawn(move || {
-            handle_client(stream?, new_sum_handle)
-        });
+        let _ = spawn(move || handle_client(stream?, new_sum_handle));
     }
 
     Ok(())
 }
-

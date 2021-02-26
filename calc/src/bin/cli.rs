@@ -27,12 +27,12 @@ impl From<EvalError> for CliError {
     }
 }
 
-fn main() -> Result<(), CliError> {
+fn main() {
     // "REPL"
     // Read, Evaluate, Print, Loop
     loop {
         match process_one() {
-            Ok(ShouldContinue::Yes) => {},
+            Ok(ShouldContinue::Yes) => {}
             Ok(ShouldContinue::No) => {
                 break;
             }
@@ -55,8 +55,6 @@ fn main() -> Result<(), CliError> {
     //         None => break,
     //     }
     // }
-
-    Ok(())
 }
 
 enum ShouldContinue {
@@ -85,8 +83,7 @@ fn process_one() -> Result<ShouldContinue, CliError> {
     let mut buf = String::new();
 
     // Attempt to read a line from standard in (blocking)
-    let n_bytes_read = io::stdin()
-        .read_line(&mut buf)?;
+    let n_bytes_read = io::stdin().read_line(&mut buf)?;
 
     // If we have an empty line, skip
     if n_bytes_read == 0 {
